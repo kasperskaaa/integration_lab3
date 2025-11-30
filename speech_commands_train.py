@@ -55,9 +55,9 @@ def print_progress(current: int, total: int, prefix: str = "Progress"):
 parser = argparse.ArgumentParser(description="Train Speech Commands model")
 parser.add_argument("--output-dir", type=str, default=".",
                     help="Directory to save model and metrics")
-parser.add_argument("--epochs", type=int, default=5,
+parser.add_argument("--epochs", type=int, default=3,
                     help="Number of training epochs")
-parser.add_argument("--batch-size", type=int, default=64,
+parser.add_argument("--batch-size", type=int, default=32,
                     help="Batch size for training")
 args = parser.parse_args()
 
