@@ -1,0 +1,16 @@
+# Ignored by Docker build
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+env/
+venv/
+build/
+dist/
+*.egg-info/
+*.git
+*.DS_Store
+
+# Не ігноруємо файли моделі та templates/ — вони потрібні у контейнері
+# (залишені спеціально)
+

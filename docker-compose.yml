@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  speech-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: speech-commands-app:latest
+    container_name: speech-commands-app
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PYTHONDONTWRITEBYTECODE=1
+      - TORCHAUDIO_BACKEND=soundfile
+    restart: unless-stopped
+    # Volume для збереження навченої моделі між перезапусками
+    volumes:
+      - model-data:/app/model_data
+      # Опціонально: якщо є готова модель локально
+      # - ./model_state_dict.pt:/app/model_state_dict.pt:ro
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 600s  # 10 хвилин для навчання при першому запуску
+    # Обмеження ресурсів (можна налаштувати)
+    deploy:
+      resources:
+        limits:
+          cpus: '4'
+          memory: 4G
+        reservations:
+          cpus: '2'
+          memory: 2G
+
+volumes:
+  model-data:
+    driver: local
