@@ -25,11 +25,13 @@ warnings.filterwarnings("ignore", category=UserWarning)
 
 # Налаштування - ТІЛЬКИ 2 КЛАСИ для Docker runtime
 CLASSES = [
-    "yes", "no",
-    "up", "down", "zero", "wow", "visual", "two", "tree", "three",
+    "yes", "no","up", "down"
+    """
+    , "zero", "wow", "visual", "two", "tree", "three",
     "stop", "six", "sheila", "seven", "right", "one", "off", "nine", "marvin",
     "left", "learn", "house", "happy", "go", "four", "forward", "follow", "five",
     "eight", "dog", "cat", "bird", "bed", "backward"
+    """
 ]
 N_CLASSES = len(CLASSES)
 MODEL_PATH = "model_state_dict.pt"

@@ -87,11 +87,13 @@ print_header("НАЛАШТУВАННЯ")
 # ВАЖЛИВО: Для Docker runtime використовуємо 2 класи для стабільного навчання
 # Для локального навчання можете використати більше класів
 CLASSES = [
-    "yes", "no",  # Мінімум 2 класи для класифікації
-     "up", "down", "zero", "wow", "visual", "two", "tree", "three",
+    "yes", "no", "up", "down"
+    """
+     , "zero", "wow", "visual", "two", "tree", "three",
      "stop", "six", "sheila", "seven", "right", "one", "off", "nine", "marvin",
      "left", "learn", "house", "happy", "go", "four", "forward", "follow", "five",
      "eight", "dog", "cat", "bird", "bed", "backward"
+    """
 ]
 N_CLASSES = len(CLASSES)
 BATCH_SIZE = args.batch_size
