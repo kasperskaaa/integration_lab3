@@ -7,24 +7,14 @@ import argparse
 import json
 import time
 import csv
-from pathlib import Path
 import warnings
 
 import torch
 import numpy as np
 
-from model_utils import SmallCNN, wav_to_melspec, load_model
+from model_utils import SmallCNN, wav_to_melspec, load_model, get_model_metadata
 
 warnings.filterwarnings("ignore", category=UserWarning)
-
-# Класи моделі
-CLASSES = [
-    "yes", "no",
-    "up", "down", "zero", "wow", "visual", "two", "tree", "three",
-    "stop", "six", "sheila", "seven", "right", "one", "off", "nine", "marvin",
-    "left", "learn", "house", "happy", "go", "four", "forward", "follow", "five",
-    "eight", "dog", "cat", "bird", "bed", "backward"
-]
 
 
 def measure_comprehensive_metrics(model_path: str, num_iterations: int = 100):
@@ -35,9 +25,19 @@ def measure_comprehensive_metrics(model_path: str, num_iterations: int = 100):
     print("⏱️  ВИМІРЮВАННЯ МЕТРИК ПРОДУКТИВНОСТІ")
     print("=" * 60)
 
+    # Читаємо метадані моделі
+    print(f"📖 Читання метаданих моделі...")
+    metadata = get_model_metadata(model_path)
+    n_classes = metadata['n_classes']
+
+    if n_classes is None:
+        raise ValueError("Не вдалося визначити кількість класів з моделі.")
+
+    print(f"✅ Метадані зчитано: {n_classes} класів")
+
     # Завантаження моделі
     device = torch.device("cpu")
-    model = load_model(SmallCNN, model_path, len(CLASSES), device)
+    model = load_model(SmallCNN, model_path, n_classes=None, device=device)
     model.eval()
 
     print(f"✅ Модель завантажена: {model_path}")
