@@ -13,7 +13,7 @@ import warnings
 import torch
 import numpy as np
 
-from model_utils import SmallCNN, wav_to_melspec, load_model, measure_latency
+from model_utils import SmallCNN, wav_to_melspec, load_model
 
 warnings.filterwarnings("ignore", category=UserWarning)
 
@@ -37,7 +37,7 @@ def measure_comprehensive_metrics(model_path: str, num_iterations: int = 100):
 
     # Завантаження моделі
     device = torch.device("cpu")
-    model = load_model(model_path, len(CLASSES), device)
+    model = load_model(SmallCNN, model_path, len(CLASSES), device)
     model.eval()
 
     print(f"✅ Модель завантажена: {model_path}")
@@ -173,4 +173,3 @@ if __name__ == "__main__":
     save_metrics(metrics, latencies, args.output)
 
     print("\n✅ Вимірювання завершено!")
-

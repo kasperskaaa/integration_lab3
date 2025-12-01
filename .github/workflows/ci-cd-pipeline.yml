@@ -57,7 +57,7 @@ jobs:
           tags: speech-commands-training:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          target: base
+          target: training
 
       - name: Save training image as artifact
         run: |
@@ -100,7 +100,7 @@ jobs:
           docker run --rm \
             -v $(pwd)/training_output:/app/training_output \
             speech-commands-training:${{ github.sha }} \
-            python speech_commands_train.py --output-dir /app/training_output
+            python speech_commands_train.py --output-dir /app/training_output --epochs 5
 
       - name: List training output
         run: |

@@ -61,7 +61,7 @@ def validate_model_consistency(model_path: str):
 
     # Завантаження моделі
     device = torch.device("cpu")
-    model = load_model(model_path, len(CLASSES), device)
+    model = load_model(SmallCNN, model_path, len(CLASSES), device)
     model.eval()
 
     print("✅ Модель завантажена успішно")
@@ -188,4 +188,3 @@ if __name__ == "__main__":
 
     exit_code = validate_model_consistency(args.model_path)
     exit(exit_code)
-
