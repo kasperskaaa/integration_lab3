@@ -505,11 +505,12 @@ print_header("ЗБЕРЕЖЕННЯ МОДЕЛЕЙ")
 print(f"💾 Зберігаємо натреновану модель...")
 
 try:
-    # Збереження state_dict
-    size_sd = save_model(model, MODEL_PATH)
+    # Збереження state_dict з метаданими
+    size_sd = save_model(model, MODEL_PATH, n_classes=N_CLASSES, class_names=CLASSES)
     print(f"✅ State dict збережено:")
     print(f"   📁 Файл: {MODEL_PATH}")
     print(f"   📏 Розмір: {size_sd / 1024:.1f} KB")
+    print(f"   📊 Класів: {N_CLASSES}")
 
     # Збереження TorchScript
     try:
