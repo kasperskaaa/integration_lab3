@@ -95,9 +95,19 @@ def measure_latency(model: nn.Module, example_input: torch.Tensor, runs: int = 3
     return sum(times) / len(times)
 
 
-def save_model(model: nn.Module, path: str) -> int:
-    """Зберігає state_dict моделі та повертає розмір файлу"""
-    torch.save(model.state_dict(), path)
+def save_model(model: nn.Module, path: str, n_classes: int = None, class_names: list = None) -> int:
+    """Зберігає модель (state_dict) та метадані, повертає розмір файлу"""
+    # Створюємо об'єкт для збереження
+    save_dict = {
+        'state_dict': model.state_dict(),
+        'n_classes': n_classes if n_classes is not None else model.classifier[-1].out_features,
+    }
+
+    # Додаємо назви класів якщо передані
+    if class_names is not None:
+        save_dict['class_names'] = class_names
+
+    torch.save(save_dict, path)
     return os.path.getsize(path)
 
 
@@ -109,13 +119,58 @@ def export_torchscript(model: nn.Module, example_input: torch.Tensor, path: str)
     return os.path.getsize(path)
 
 
-def load_model(model_class, path: str, n_classes: int = 2, device: torch.device = None) -> nn.Module:
-    """Завантажує модель з збереженого state_dict"""
+def load_model(model_class, path: str, n_classes: int = None, device: torch.device = None) -> nn.Module:
+    """Завантажує модель з збереженого state_dict та метаданих"""
     if device is None:
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+    # Завантажуємо збережені дані
+    checkpoint = torch.load(path, map_location=device)
+
+    # Перевіряємо формат (старий або новий)
+    if isinstance(checkpoint, dict) and 'state_dict' in checkpoint:
+        # Новий формат з метаданими
+        state_dict = checkpoint['state_dict']
+        saved_n_classes = checkpoint.get('n_classes', n_classes)
+
+        # Використовуємо збережену кількість класів якщо не передана явно
+        if n_classes is None:
+            n_classes = saved_n_classes
+    else:
+        # Старий формат - тільки state_dict
+        state_dict = checkpoint
+        if n_classes is None:
+            raise ValueError("n_classes must be provided for old format models")
+
+    # Створюємо модель з правильною кількістю класів
     model = model_class(n_classes=n_classes)
-    model.load_state_dict(torch.load(path, map_location=device))
+    model.load_state_dict(state_dict)
     model.to(device)
     model.eval()
     return model
+
+
+def get_model_metadata(path: str) -> dict:
+    """Отримує метадані моделі без завантаження в пам'ять"""
+    checkpoint = torch.load(path, map_location='cpu')
+
+    if isinstance(checkpoint, dict) and 'state_dict' in checkpoint:
+        return {
+            'n_classes': checkpoint.get('n_classes'),
+            'class_names': checkpoint.get('class_names'),
+            'has_metadata': True
+        }
+    else:
+        # Старий формат - намагаємось визначити з розміру останнього шару
+        if 'classifier.4.weight' in checkpoint:
+            n_classes = checkpoint['classifier.4.weight'].shape[0]
+            return {
+                'n_classes': n_classes,
+                'class_names': None,
+                'has_metadata': False
+            }
+        return {
+            'n_classes': None,
+            'class_names': None,
+            'has_metadata': False
+        }
